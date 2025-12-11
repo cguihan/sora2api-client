@@ -1,9 +1,9 @@
 # Sora Client 🎥
 
-> A Premium Desktop Client for Sora Video Generation API.
-> 极简、优雅的 Sora 视频生成桌面客户端。
+> A Premium Desktop Client for [TheSmallHanCat/sora2api](https://github.com/TheSmallHanCat/sora2api).
+> 专为 `sora2api` 开源项目打造的极简、优雅桌面客户端。
 
-![App Screenshot](https://via.placeholder.com/800x450.png?text=Sora+Client+Preview)
+![App Screenshot](./screenshot.png)
 
 ## ✨ Features (功能特性)
 
@@ -31,7 +31,7 @@
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/sora-client.git
+   git clone https://github.com/onelxw/sora2api-client.git
    cd sora-client
    ```
 
