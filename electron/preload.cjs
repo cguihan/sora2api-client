@@ -9,5 +9,9 @@ contextBridge.exposeInMainWorld('api', {
         minimize: () => ipcRenderer.invoke('window:minimize'),
         maximize: () => ipcRenderer.invoke('window:maximize'),
         close: () => ipcRenderer.invoke('window:close')
+    },
+    db: {
+        save: (key, data) => ipcRenderer.invoke('db:save', key, data),
+        load: (key) => ipcRenderer.invoke('db:load', key)
     }
 });

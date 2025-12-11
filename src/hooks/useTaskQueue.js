@@ -3,20 +3,58 @@ import { v4 as uuidv4 } from 'uuid';
 import { parseStreamChunk, extractProgress, extractVideoUrl } from '../utils/streamParser';
 
 export function useTaskQueue(settings) {
-    const [tasks, setTasks] = useState(() => {
-        try {
-            const saved = localStorage.getItem('sora_tasks');
-            return saved ? JSON.parse(saved) : [];
-        } catch (e) {
-            console.warn("Failed to load tasks", e);
-            return [];
-        }
-    });
+    const [tasks, setTasks] = useState([]);
+    const [isLoaded, setIsLoaded] = useState(false);
 
-    // Persistent storage
+    // Load from DB (Async)
     useEffect(() => {
-        localStorage.setItem('sora_tasks', JSON.stringify(tasks));
-    }, [tasks]);
+        const loadTasks = async () => {
+            if (window.api && window.api.db) {
+                try {
+                    const saved = await window.api.db.load('sora_tasks');
+                    if (saved && Array.isArray(saved)) {
+                        setTasks(saved);
+                    } else {
+                        // Migrate from localStorage if DB is empty
+                        const old = localStorage.getItem('sora_tasks');
+                        if (old) setTasks(JSON.parse(old));
+                    }
+                } catch (e) {
+                    console.error("DB Load failed", e);
+                }
+            } else {
+                // Browser Fallback
+                try {
+                    const saved = localStorage.getItem('sora_tasks');
+                    if (saved) setTasks(JSON.parse(saved));
+                } catch (e) { console.warn(e) }
+            }
+            setIsLoaded(true);
+        };
+        loadTasks();
+    }, []);
+
+    // Persistent storage (Save)
+    useEffect(() => {
+        if (!isLoaded) return; // Prevent overwriting DB with empty state before load
+
+        if (window.api && window.api.db) {
+            window.api.db.save('sora_tasks', tasks);
+        } else {
+            // Browser Fallback with Quota Protection
+            try {
+                localStorage.setItem('sora_tasks', JSON.stringify(tasks));
+            } catch (e) {
+                if (e.name === 'QuotaExceededError' || e.code === 22) {
+                    const leanTasks = tasks.map(t => ({
+                        ...t,
+                        image: t.image && t.image.length > 1000 ? null : t.image
+                    }));
+                    try { localStorage.setItem('sora_tasks', JSON.stringify(leanTasks)); } catch (_) { }
+                }
+            }
+        }
+    }, [tasks, isLoaded]);
 
     const activeTasksCount = useRef(0);
     const maxConcurrent = settings.concurrency || 2; // Dynamic limit

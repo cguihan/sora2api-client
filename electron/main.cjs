@@ -123,3 +123,32 @@ ipcMain.handle('window:close', () => mainWindow?.close());
 ipcMain.handle('window:update-title-bar', (event, config) => {
   // No-op for custom frame
 });
+
+// --- Local File Storage Support (Unlimited Quota) ---
+const STORAGE_DIR = path.join(app.getPath('userData'), 'storage');
+if (!fs.existsSync(STORAGE_DIR)) {
+  fs.mkdirSync(STORAGE_DIR, { recursive: true });
+}
+
+ipcMain.handle('db:save', async (event, key, data) => {
+  try {
+    const filePath = path.join(STORAGE_DIR, `${key}.json`);
+    await fs.promises.writeFile(filePath, JSON.stringify(data));
+    return { success: true };
+  } catch (e) {
+    console.error(`DB Save Error (${key}):`, e);
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('db:load', async (event, key) => {
+  try {
+    const filePath = path.join(STORAGE_DIR, `${key}.json`);
+    if (!fs.existsSync(filePath)) return null;
+    const data = await fs.promises.readFile(filePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (e) {
+    console.error(`DB Load Error (${key}):`, e);
+    return null;
+  }
+});

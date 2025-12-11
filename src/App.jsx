@@ -60,7 +60,11 @@ export default function App() {
 
   // Persist drafts
   useEffect(() => {
-    localStorage.setItem('sora_project_drafts', JSON.stringify(projectDrafts));
+    try {
+      localStorage.setItem('sora_project_drafts', JSON.stringify(projectDrafts));
+    } catch (e) {
+      console.warn("Failed to save drafts:", e);
+    }
   }, [projectDrafts]);
 
   const currentDraft = projectDrafts[activeProjectId] || {
