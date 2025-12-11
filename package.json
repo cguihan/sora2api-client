@@ -1,0 +1,71 @@
+{
+  "name": "shiliusora",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Sora Client Application",
+  "author": "Your Name",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "concurrently \"vite\" \"wait-on tcp:19999 && cross-env ELECTRON_START_URL=http://localhost:19999 electron .\"",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "mock": "node mock_server.cjs",
+    "dist": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.556.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwind-merge": "^3.4.0",
+    "uuid": "^13.0.0",
+    "wait-on": "^9.0.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.22",
+    "electron": "^39.2.6",
+    "electron-builder": "^26.0.12",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "vite": "^7.2.4"
+  },
+  "build": {
+    "appId": "com.sora.client",
+    "productName": "Sora Client",
+    "directories": {
+      "output": "dist_electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "resources/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "portable": {
+      "artifactName": "${productName} Portable ${version}.${ext}"
+    }
+  }
+}

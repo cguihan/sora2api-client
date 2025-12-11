@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #f8f9fa;
+  /* Light Gray Background */
+  --bg-secondary: #ffffff;
+  /* White Cards */
+  /* Light Inputs */
+  --text-primary: #1a1a1a;
+  /* Dark Text */
+  --text-secondary: #4b5563;
+  /* Gray Text (Darkened from #6e7a89) */
+  --accent-color: #3b82f6;
+  /* Blue Accent - Keep for text/borders */
+  --accent-hover: #2563eb;
+  --gradient-primary: linear-gradient(135deg, #2563eb 0%, #9333ea 100%);
+  --gradient-hover: linear-gradient(135deg, #1d4ed8 0%, #7e22ce 100%);
+
+  --border-color: rgba(255, 255, 255, 0.4);
+  /* Glass Border */
+  --card-radius: 12px;
+  --input-radius: 8px;
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Glassmorphism Variables */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-backdrop: blur(16px);
+
+  --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  /* background-color: var(--bg-primary); */
+  background: url('./assets/bg.png') no-repeat center center fixed;
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  /* Transparent gray */
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.6);
+  /* Darker on hover */
+}
+
+#root {
+  height: 100%;
+  display: flex;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--input-radius);
+  padding: 8px 12px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  background-color: #fff;
+}
+
+/* Electron Window Drag Controls */
+.app-drag-region {
+  -webkit-app-region: drag;
+  user-select: none;
+  /* 防止拖拽时选中文字 */
+}
+
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Utilities */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.premium-btn {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--input-radius);
+  font-weight: 600;
+  transition: transform 0.1s, opacity 0.2s;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.premium-btn:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.premium-btn:active {
+  transform: scale(0.98);
+}

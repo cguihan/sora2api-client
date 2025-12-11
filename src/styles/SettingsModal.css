@@ -1,0 +1,91 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    /* Lighter backdrop */
+    backdrop-filter: blur(8px);
+    /* Stronger blur */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+    width: 500px;
+    background-color: var(--bg-secondary);
+    padding: 30px;
+    border-radius: var(--card-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    /* Softer shadow */
+}
+
+.modal-content input {
+    background-color: #f3f4f6;
+    /* Slightly darker gray than tertiary */
+    border: 1px solid #d1d5db;
+    /* Darker border for visibility */
+    color: var(--text-primary);
+}
+
+.modal-content input:focus {
+    background-color: #ffffff;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.modal-content label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-primary);
+    /* Darker text for readability */
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.cancel-btn {
+    padding: 10px 20px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.cancel-btn:hover {
+    color: var(--text-primary);
+}
+
+.icon-btn {
+    background-color: var(--bg-tertiary);
+    width: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--input-radius);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    /* Fix contrast */
+}
+
+.icon-btn:hover {
+    background-color: #444;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
