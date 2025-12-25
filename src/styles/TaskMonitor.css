@@ -5,7 +5,7 @@
     /* Internal padding like TaskForm */
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible;
 
     /* Glass Effect Container */
     background: var(--glass-bg);
@@ -64,6 +64,64 @@
     /* Critical for nested flex scrolling */
 }
 
+.task-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 120px;
+    gap: 12px;
+    align-items: start;
+}
+
+.task-thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.task-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.no-thumb { width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); }
+
+.task-main { min-width: 0; }
+
+.status-column { display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+.status-badge-wrapper { position: relative; overflow: visible; }
+
+.status-tooltip {
+    position: absolute;
+    right: 0;
+    top: 36px;
+    width: auto;
+    min-width: 280px;
+    max-width: 720px;
+    max-height: 60vh;
+    overflow: auto;
+    background: rgba(17,24,39,0.98);
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.12s ease, transform 0.12s ease;
+    z-index: 9999;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 12px;
+}
+
+.status-badge-wrapper:hover .status-tooltip { opacity: 1; transform: translateY(0); }
+.tooltip-title { font-weight: 600; margin-bottom: 6px; color: #a3e635; }
+.tooltip-body { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Segoe UI Mono', monospace; font-size: 12px; color: #e5e7eb; }
+
+.open-video-btn { background: transparent; border: none; padding: 6px; cursor: pointer; }
+
 .task-item {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-color);
@@ -72,7 +130,7 @@
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     flex-shrink: 0;
     /* Checkpoint: Fix squeezing */
 }

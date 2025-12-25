@@ -36,7 +36,7 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Task Queue Hook
-  const { tasks, addTask, clearTasks } = useTaskQueue(settings);
+  const { tasks, addTask, clearTasks, deleteTask, retryTask } = useTaskQueue(settings);
 
   // Filter tasks by project? (Optional requirement, but good for "Projects")
   // User said "The sidebar can create new projects". "Clicking a task... shows details".
@@ -195,7 +195,9 @@ export default function App() {
             <TaskMonitor
               tasks={projectTasks}
               onTaskClick={handleOpenTask}
-              onClearTasks={clearTasks}
+              onClearTasks={() => clearTasks(activeProjectId)}
+              onDeleteTask={deleteTask}
+              onRetryTask={retryTask}
               onEditTask={handleEditTask}
             />
           </div>

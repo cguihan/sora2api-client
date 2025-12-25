@@ -1,8 +1,8 @@
 import React from 'react';
-import { Play, CheckCircle, AlertCircle, Loader2, Download, Trash2, Pencil, Image as ImageIcon } from 'lucide-react';
+import { Play, CheckCircle, AlertCircle, Loader2, Download, Trash2, Pencil, Image as ImageIcon, RefreshCw } from 'lucide-react';
 import '../styles/TaskMonitor.css';
 
-export default function TaskMonitor({ tasks, onTaskClick, onClearTasks, onEditTask }) {
+export default function TaskMonitor({ tasks, onTaskClick, onClearTasks, onEditTask, onDeleteTask, onRetryTask }) {
     if (tasks.length === 0) {
         return (
             <div className="task-monitor-empty">
@@ -31,36 +31,51 @@ export default function TaskMonitor({ tasks, onTaskClick, onClearTasks, onEditTa
                         key={task.id}
                         className={`task-item ${task.status} ${task.downloaded ? 'downloaded' : ''}`}
                     >
-                        <div className="task-header">
-                            <div className="flex items-center gap-2">
-                                <span className="task-model-badge">{task.model}</span>
-                                <span className="task-time">{new Date(task.createdAt).toLocaleTimeString()}</span>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                {/* Edit Button */}
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); onEditTask(task); }}
-                                    className="p-1 hover:bg-[var(--bg-tertiary)] rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-                                    title="编辑并重新生成"
-                                >
-                                    <Pencil size={14} />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-3 mt-2">
-                            {task.image ? (
-                                <div className="w-20 h-20 rounded bg-[var(--bg-tertiary)] border border-[var(--border-color)] overflow-hidden flex-shrink-0 cursor-pointer" onClick={() => onTaskClick(task)}>
+                        <div className="task-row">
+                            <div className="task-thumb" onClick={() => onTaskClick(task)}>
+                                {task.image ? (
                                     <img src={task.image} className="w-full h-full object-cover" alt="ref" />
-                                </div>
-                            ) : (
-                                <div className="w-20 h-20 rounded bg-[var(--bg-tertiary)] border border-[var(--border-color)] flex items-center justify-center flex-shrink-0 text-[var(--text-secondary)]" title="无参考图">
-                                    <ImageIcon size={24} opacity={0.3} />
-                                </div>
-                            )}
+                                ) : (
+                                    <div className="no-thumb"><ImageIcon size={24} opacity={0.3} /></div>
+                                )}
+                            </div>
 
-                            <div className="flex-1 min-w-0 flex flex-col justify-center">
+                            <div className="task-main">
+                                <div className="task-header">
+                                    <div className="flex items-center gap-2">
+                                        <span className="task-model-badge">{task.model}</span>
+                                        <span className="task-time">{new Date(task.createdAt).toLocaleTimeString()}</span>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onEditTask(task); }}
+                                            className="p-1 hover:bg-[var(--bg-tertiary)] rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                                            title="编辑并重新生成"
+                                        >
+                                            <Pencil size={14} />
+                                        </button>
+                                        {task.status === 'failed' && onRetryTask && (
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); onRetryTask(task.id); }}
+                                                className="p-1 hover:bg-[var(--bg-tertiary)] rounded text-[var(--text-primary)] hover:text-[var(--accent-color)] transition-colors"
+                                                title="重试任务"
+                                            >
+                                                <RefreshCw size={14} />
+                                            </button>
+                                        )}
+                                        {task.status === 'failed' && onDeleteTask && (
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); onDeleteTask(task.id); }}
+                                                className="p-1 hover:bg-[var(--bg-tertiary)] rounded text-red-500 hover:text-red-600 transition-colors"
+                                                title="删除失败任务"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
                                 <p
                                     className="task-prompt cursor-pointer hover:text-[var(--accent-color)] transition-colors"
                                     onClick={() => onTaskClick(task)}
@@ -69,9 +84,18 @@ export default function TaskMonitor({ tasks, onTaskClick, onClearTasks, onEditTa
                                     {task.prompt}
                                 </p>
 
-                                {/* Removed progress container from here */}
+                                <div className="mt-2">
+                                    {task.status === 'running' && (
+                                        <div className="progress-container">
+                                            <div className="progress-bar-bg"><div className="progress-bar-fill" style={{ width: `${task.progress}%` }} /></div>
+                                            <div className="progress-text">{task.progress}%</div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
-                                <div className="task-footer mt-auto pt-2">
+                            <div className="status-column">
+                                <div className="status-badge-wrapper">
                                     <div className="status-indicator">
                                         {task.status === 'pending' && <span className="status-badge pending">等待中</span>}
                                         {task.status === 'running' && <span className="status-badge running"><Loader2 size={12} className="animate-spin" /> 生成中</span>}
@@ -79,22 +103,21 @@ export default function TaskMonitor({ tasks, onTaskClick, onClearTasks, onEditTa
                                         {task.status === 'failed' && <span className="status-badge failed"><AlertCircle size={12} /> 失败</span>}
                                     </div>
 
-                                    {task.status === 'running' && (
-                                        <span className="text-xs font-mono text-[var(--accent-color)]">
-                                            {task.progress}%
-                                        </span>
-                                    )}
-
-                                    {(task.localPath || task.videoUrl) && (
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); onTaskClick(task); }}
-                                            className="text-[var(--text-secondary)] hover:scale-110 transition-transform p-1"
-                                            title="打开视频"
-                                        >
-                                            <Play size={24} fill="url(#play-gradient)" stroke="url(#play-gradient)" />
-                                        </button>
-                                    )}
+                                    <div className="status-tooltip" role="tooltip">
+                                        <div className="tooltip-title">实时响应</div>
+                                        <pre className="tooltip-body">{task.logs ? task.logs : '暂无接收数据'}</pre>
+                                    </div>
                                 </div>
+
+                                {(task.localPath || task.videoUrl) && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onTaskClick(task); }}
+                                        className="open-video-btn"
+                                        title="打开视频"
+                                    >
+                                        <Play size={20} fill="url(#play-gradient)" stroke="url(#play-gradient)" />
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>

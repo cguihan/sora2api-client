@@ -59,10 +59,36 @@ export function useTaskQueue(settings) {
     const activeTasksCount = useRef(0);
     const maxConcurrent = settings.concurrency || 2; // Dynamic limit
 
-    const clearTasks = () => {
-        if (window.confirm("确定要清空所有任务记录吗？")) {
+    const clearTasks = (projectId) => {
+        if (projectId) {
+            if (!window.confirm("确定要清空当前项目的任务记录吗？")) return;
+            setTasks(prev => prev.filter(t => t.projectId !== projectId));
+
+            // Update fallback storage immediately to avoid race with effect
+            if (!(window.api && window.api.db)) {
+                try {
+                    const saved = JSON.parse(localStorage.getItem('sora_tasks') || '[]');
+                    const filtered = saved.filter(t => t.projectId !== projectId);
+                    localStorage.setItem('sora_tasks', JSON.stringify(filtered));
+                } catch (e) { /* ignore */ }
+            }
+        } else {
+            if (!window.confirm("确定要清空所有任务记录吗？")) return;
             setTasks([]);
             localStorage.removeItem('sora_tasks');
+        }
+    };
+
+    const deleteTask = (id) => {
+        if (!window.confirm('确定要删除该任务吗？')) return;
+        setTasks(prev => prev.filter(t => t.id !== id));
+
+        if (!(window.api && window.api.db)) {
+            try {
+                const saved = JSON.parse(localStorage.getItem('sora_tasks') || '[]');
+                const filtered = saved.filter(t => t.id !== id);
+                localStorage.setItem('sora_tasks', JSON.stringify(filtered));
+            } catch (e) { /* ignore */ }
         }
     };
 
@@ -75,9 +101,44 @@ export function useTaskQueue(settings) {
             logs: '',
             downloaded: false,
             localPath: null,
+            retryCount: 0,
             ...taskData
         };
         setTasks(prev => [newTask, ...prev]);
+    };
+
+    const retryTask = (id) => {
+        if (!window.confirm('确定要重试该任务吗？')) return;
+        setTasks(prev => prev.map(t => t.id === id ? ({
+            ...t,
+            status: 'pending',
+            progress: 0,
+            logs: '',
+            videoUrl: null,
+            downloaded: false,
+            localPath: null,
+            retryCount: (t.retryCount || 0) + 1,
+            createdAt: Date.now()
+        }) : t));
+
+        // Update fallback storage immediately
+        if (!(window.api && window.api.db)) {
+            try {
+                const saved = JSON.parse(localStorage.getItem('sora_tasks') || '[]');
+                const updated = saved.map(t => t.id === id ? ({
+                    ...t,
+                    status: 'pending',
+                    progress: 0,
+                    logs: '',
+                    videoUrl: null,
+                    downloaded: false,
+                    localPath: null,
+                    retryCount: (t.retryCount || 0) + 1,
+                    createdAt: Date.now()
+                }) : t);
+                localStorage.setItem('sora_tasks', JSON.stringify(updated));
+            } catch (e) { /* ignore */ }
+        }
     };
 
     const updateTask = (id, updates) => {
@@ -180,6 +241,7 @@ export function useTaskQueue(settings) {
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
 
+            let lastLogUpdate = Date.now();
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
@@ -195,8 +257,16 @@ export function useTaskQueue(settings) {
 
                         // Check progress
                         const progress = extractProgress(text);
+                        const now = Date.now();
+
+                        // Update progress immediately when provided
                         if (progress !== null) {
-                            updateTask(task.id, { progress, logs: fullLogs }); // Optim: Don't update logs constantly if huge
+                            updateTask(task.id, { progress, logs: fullLogs });
+                            lastLogUpdate = now;
+                        } else if (now - lastLogUpdate > 300) {
+                            // Throttle log updates to avoid excessive re-renders
+                            updateTask(task.id, { logs: fullLogs });
+                            lastLogUpdate = now;
                         }
 
                         // Check URL
@@ -247,6 +317,8 @@ export function useTaskQueue(settings) {
         tasks,
         addTask,
         clearTasks,
+        deleteTask,
+        retryTask,
         activeTasks: activeTasksCount.current
     };
 }
